@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SY yaratuvchi</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="hero">
+    <h1 class="title">Xush kelibsiz <span class="Welcome"></span></h1>
+    <p class="subtitle">Bu sayt aynan siz uchun</p>
+    <a class="btn ripple">Olg'a</a>
+  </header>
+
+  <main class="container">
+    <section class="cards">
+      <article class="card">
+        <h3>Siz hohlagan hizmatlar</h3>
+        <p>Shaxsiy ma'luumotlarga kirish</p>
+      </article>
+
+      <article class="card">
+        <h3>Hakerlik tizimlar</h3>
+        <p>Siz izlagan manbalar shu yerda</p>
+      </article>
+
+      <article class="card">
+        <h3>Kuzatuv</h3>
+        <p>Telefon orqali topish</p>
+      </article>
+    </section>
+
+    <section class="glass">
+      <h2>Hammasi jamlangan </h2>
+      <p>Hakerlik,kuzatuv,va boshqa online ishlar</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>©sardorkhasan.off</p>
+  </footer>
+
+  <script>
+    // Typed effekt (soddalashtirilgan)
+    const words = ["veb", "dizayn", "kod"].map(w => w + ".");
+    let i = 0, j = 0, forward = true;
+    const el = document.querySelector('.typed');
+
+    function tick() {
+      if (!el) return;
+      if (forward) {
+        el.textContent = words[i].slice(0, ++j);
+        if (j === words[i].length) {
+          forward = false;
+          setTimeout(tick, 800);
+          return;
+        }
+      } else {
+        el.textContent = words[i].slice(0, --j);
+        if (j === 0) {
+          forward = true;
+          i = (i + 1) % words.length;
+        }
+      }
+      setTimeout(tick, forward ? 120 : 40);
+    }
+    tick();
+
+    // Ripple effektli tugma
+    document.querySelectorAll('.ripple').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        const rect = this.getBoundingClientRect();
+        const circle = document.createElement('span');
+        const size = Math.max(rect.width, rect.height);
+        circle.style.width = circle.style.height = size + 'px';
+        circle.style.left = (e.clientX - rect.left - size/2) + 'px';
+        circle.style.top = (e.clientY - rect.top - size/2) + 'px';
+        circle.classList.add('ripple-effect');
+        this.appendChild(circle);
+        setTimeout(() => circle.remove(), 600);
+      });
+    });
+  </script>
+</body>
+</html>

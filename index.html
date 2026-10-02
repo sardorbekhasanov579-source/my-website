@@ -1,86 +1,728 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="uz">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SY yaratuvchi</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartMed - Shifokorga onlayn navbat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #0b2545;
+            --blue: #1a6fd4;
+            --blue-dark: #1558ab;
+            --sky: #eaf3fd;
+            --surface: #f5f9fd;
+            --line: #d6e4f3;
+            --text: #12263f;
+            --muted: #5a6f87;
+            --teal: #0f9d84;
+            --pulse: #5ad1ff;
+            --danger: #c62828;
+            --head: 'Bricolage Grotesque', 'Segoe UI', Tahoma, sans-serif;
+            --body: 'Manrope', 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            margin: 0;
+            font-family: var(--body);
+            color: var(--text);
+            background: var(--surface);
+            line-height: 1.55;
+        }
+
+        h1, h2, h3 { font-family: var(--head); margin: 0; line-height: 1.15; }
+
+        a { color: inherit; }
+
+        :focus-visible {
+            outline: 3px solid var(--pulse);
+            outline-offset: 3px;
+        }
+
+        .wrap { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+
+        /* ---------- Hero ---------- */
+        .hero {
+            position: relative;
+            overflow: hidden;
+            background-color: var(--navy);
+            /* EKG qog'ozi katakchalari */
+            background-image:
+                linear-gradient(rgba(90, 209, 255, 0.10) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(90, 209, 255, 0.10) 1px, transparent 1px),
+                linear-gradient(rgba(90, 209, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(90, 209, 255, 0.05) 1px, transparent 1px);
+            background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+            color: #fff;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 22px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--head);
+            font-weight: 700;
+            font-size: 1.35rem;
+            text-decoration: none;
+        }
+
+        .nav-links { display: flex; align-items: center; gap: 26px; }
+        .nav-links a { text-decoration: none; font-weight: 600; font-size: 0.95rem; color: #cfe3f7; }
+        .nav-links a:hover { color: #fff; }
+
+        .nav-call {
+            background: #fff;
+            color: var(--navy) !important;
+            padding: 9px 18px;
+            border-radius: 999px;
+        }
+        .nav-call:hover { background: var(--sky); }
+
+        .hero-body { padding: 70px 0 190px; max-width: 640px; }
+
+        .hero h1 {
+            font-size: clamp(2.3rem, 6vw, 3.7rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .hero p.lead {
+            margin: 20px 0 30px;
+            font-size: 1.12rem;
+            color: #cfe3f7;
+            max-width: 52ch;
+        }
+
+        .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; }
+
+        .live-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            color: #cfe3f7;
+        }
+        .live-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--pulse);
+            box-shadow: 0 0 0 0 rgba(90, 209, 255, 0.7);
+            animation: beat 1.6s infinite;
+        }
+
+        /* Yurak urishi chizig'i: sahifadagi asosiy animatsiya */
+        .ecg {
+            position: absolute;
+            left: 0; right: 0; bottom: 28px;
+            width: 100%; height: 130px;
+            pointer-events: none;
+        }
+        .ecg path {
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            vector-effect: non-scaling-stroke;
+        }
+        .ecg-base { stroke: rgba(90, 209, 255, 0.22); stroke-width: 2; }
+        .ecg-live {
+            stroke: var(--pulse);
+            stroke-width: 3;
+            stroke-dasharray: 150 850;
+            filter: drop-shadow(0 0 6px rgba(90, 209, 255, 0.9));
+            animation: sweep 3.4s linear infinite;
+        }
+
+        /* ---------- Buttons ---------- */
+        .btn {
+            display: inline-block;
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font: 700 0.97rem var(--body);
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s ease;
+        }
+        .btn:hover { background: var(--blue-dark); }
+        .btn:disabled { background: #b8c7d9; cursor: not-allowed; }
+        .btn-light { background: #fff; color: var(--navy); }
+        .btn-light:hover { background: var(--sky); }
+        .btn-block { width: 100%; padding: 14px; font-size: 1rem; }
+
+        /* ---------- Sections ---------- */
+        section { padding: 72px 0; }
+        section h2 { font-size: clamp(1.7rem, 4vw, 2.2rem); margin-bottom: 8px; }
+        .section-sub { color: var(--muted); margin: 0 0 28px; max-width: 56ch; }
+
+        /* Filtr */
+        .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+        .chip {
+            border: 1.5px solid var(--line);
+            background: #fff;
+            color: var(--text);
+            padding: 8px 18px;
+            border-radius: 999px;
+            font: 600 0.92rem var(--body);
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+        }
+        .chip:hover { border-color: var(--blue); }
+        .chip[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+        /* Shifokorlar ro'yxati */
+        .doc-list { background: #fff; border: 1px solid var(--line); border-radius: 18px; }
+
+        .doc {
+            display: grid;
+            grid-template-columns: 64px 1fr auto;
+            gap: 20px;
+            align-items: center;
+            padding: 22px 26px;
+            border-bottom: 1px solid var(--line);
+            transition: background 0.2s ease;
+        }
+        .doc:last-child { border-bottom: none; }
+        .doc:hover { background: var(--surface); }
+
+        .doc-avatar {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            background: var(--sky);
+            display: grid; place-items: center;
+            font-size: 1.8rem;
+        }
+
+        .doc h3 { font-size: 1.2rem; color: var(--navy); }
+        .doc-spec { margin: 2px 0 10px; color: var(--blue); font-weight: 700; font-size: 0.95rem; }
+
+        .slots { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+        .slots li {
+            font-size: 0.85rem; font-weight: 600;
+            color: var(--teal);
+            border: 1px solid #bfe6dd;
+            background: #f1fbf8;
+            border-radius: 8px;
+            padding: 3px 10px;
+        }
+        .slots li.none { color: var(--muted); border-color: var(--line); background: var(--surface); }
+
+        .doc-side { text-align: right; }
+        .price { font-family: var(--head); font-weight: 700; font-size: 1.15rem; color: var(--navy); margin-bottom: 10px; }
+
+        .state { text-align: center; color: var(--muted); padding: 40px 20px; margin: 0; }
+
+        /* Qanday ishlaydi */
+        .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; list-style: none; padding: 0; margin: 0; counter-reset: step; }
+        .steps li { position: relative; padding-top: 58px; }
+        .steps li::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute; top: 0; left: 0;
+            width: 42px; height: 42px; border-radius: 50%;
+            background: var(--blue); color: #fff;
+            display: grid; place-items: center;
+            font: 700 1.1rem var(--head);
+        }
+        .steps li::after {
+            content: "";
+            position: absolute; top: 20px; left: 54px; right: -18px;
+            height: 2px; background: var(--line);
+        }
+        .steps li:last-child::after { display: none; }
+        .steps h3 { font-size: 1.1rem; margin-bottom: 6px; color: var(--navy); }
+        .steps p { margin: 0; color: var(--muted); font-size: 0.97rem; }
+
+        /* Bog'lanish */
+        .contact { background: var(--navy); color: #fff; }
+        .contact-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 48px; align-items: start; }
+        .contact .section-sub { color: #cfe3f7; }
+        .contact-list { list-style: none; margin: 0; padding: 0; }
+        .contact-list li {
+            display: grid; grid-template-columns: 44px 1fr; gap: 16px;
+            padding: 18px 0;
+            border-bottom: 1px solid rgba(207, 227, 247, 0.18);
+        }
+        .contact-list li:first-child { padding-top: 0; }
+        .contact-list li:last-child { border-bottom: none; }
+        .c-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            background: rgba(90, 209, 255, 0.14);
+            display: grid; place-items: center; font-size: 1.25rem;
+        }
+        .c-label { display: block; color: #9fbddb; font-size: 0.88rem; }
+        .c-value { font-weight: 700; font-size: 1.08rem; text-decoration: none; }
+        a.c-value:hover { color: var(--pulse); }
+
+        footer { background: #071a31; color: #9fbddb; padding: 22px 0; font-size: 0.9rem; text-align: center; }
+
+        /* Tezkor qo'ng'iroq tugmasi */
+        .fab {
+            position: fixed; right: 20px; bottom: 20px; z-index: 50;
+            width: 56px; height: 56px; border-radius: 50%;
+            background: var(--blue); color: #fff;
+            display: grid; place-items: center;
+            font-size: 1.45rem; text-decoration: none;
+            box-shadow: 0 8px 20px rgba(11, 37, 69, 0.3);
+            transition: background 0.2s ease;
+        }
+        .fab:hover { background: var(--blue-dark); }
+
+        /* ---------- Modal ---------- */
+        .modal {
+            display: none;
+            position: fixed; inset: 0; z-index: 999;
+            background: rgba(11, 37, 69, 0.55);
+            backdrop-filter: blur(3px);
+            justify-content: center; align-items: center;
+            padding: 20px;
+        }
+        .modal.open { display: flex; }
+
+        .modal-content {
+            position: relative;
+            background: #fff;
+            border-radius: 20px;
+            width: 100%; max-width: 440px;
+            padding: 30px;
+            max-height: 92vh; overflow-y: auto;
+            animation: rise 0.28s ease-out;
+        }
+        .modal-content h3 { font-size: 1.45rem; color: var(--navy); }
+        .modal-doc { margin: 6px 0 22px; font-weight: 700; color: var(--blue); }
+        .modal-doc span { display: block; color: var(--muted); font-weight: 500; font-size: 0.92rem; }
+
+        .close-btn {
+            position: absolute; top: 18px; right: 18px;
+            width: 34px; height: 34px; border: none; border-radius: 50%;
+            background: var(--sky); color: var(--muted);
+            font-size: 1rem; cursor: pointer;
+        }
+        .close-btn:hover { background: #fde4e4; color: var(--danger); }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group > label, .form-group > .label {
+            display: block; margin-bottom: 8px;
+            font-weight: 700; font-size: 0.92rem; color: var(--text);
+        }
+        .form-group input {
+            width: 100%; padding: 13px 14px;
+            border: 1.5px solid var(--line); border-radius: 10px;
+            font: 500 1rem var(--body); color: var(--text);
+        }
+        .form-group input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26, 111, 212, 0.18); }
+
+        .time-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+        .time-grid .chip { padding: 9px 16px; }
+
+        .form-error { color: var(--danger); font-weight: 600; font-size: 0.92rem; margin: -6px 0 14px; min-height: 1.2em; }
+
+        /* Muvaffaqiyat oynasi */
+        .success { text-align: center; }
+        .check { width: 76px; height: 76px; margin: 0 auto 14px; display: block; }
+        .check circle { fill: #e6f7f3; }
+        .check path {
+            fill: none; stroke: var(--teal); stroke-width: 5;
+            stroke-linecap: round; stroke-linejoin: round;
+            stroke-dasharray: 60; stroke-dashoffset: 60;
+            animation: draw 0.5s 0.15s ease-out forwards;
+        }
+        .receipt { margin: 18px 0 22px; border: 1px dashed #aac3de; border-radius: 12px; padding: 6px 16px; text-align: left; }
+        .receipt div { display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 0.95rem; }
+        .receipt div:last-child { border-bottom: none; }
+        .receipt dt { color: var(--muted); }
+        .receipt dd { margin: 0; font-weight: 700; text-align: right; }
+
+        /* Xabar (toast) */
+        .toast {
+            position: fixed; left: 50%; bottom: 28px; z-index: 1000;
+            transform: translate(-50%, 20px);
+            background: var(--navy); color: #fff;
+            padding: 12px 20px; border-radius: 10px;
+            font-weight: 600; font-size: 0.95rem;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            max-width: calc(100vw - 40px);
+        }
+        .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+        /* ---------- Animatsiyalar ---------- */
+        @keyframes sweep {
+            from { stroke-dashoffset: 150; }
+            to   { stroke-dashoffset: -850; }
+        }
+        @keyframes beat {
+            0%   { box-shadow: 0 0 0 0 rgba(90, 209, 255, 0.7); }
+            70%  { box-shadow: 0 0 0 12px rgba(90, 209, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(90, 209, 255, 0); }
+        }
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes draw { to { stroke-dashoffset: 0; } }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .ecg-live { animation: none; stroke-dasharray: none; filter: none; }
+            .live-dot, .modal-content { animation: none; }
+            .check path { animation: none; stroke-dashoffset: 0; }
+        }
+
+        /* ---------- Telefon ---------- */
+        @media (max-width: 760px) {
+            .nav-links a:not(.nav-call) { display: none; }
+            .hero-body { padding: 40px 0 160px; }
+            .ecg { height: 100px; }
+
+            .doc { grid-template-columns: 52px 1fr; padding: 18px; gap: 14px; }
+            .doc-avatar { width: 52px; height: 52px; font-size: 1.5rem; }
+            .doc-side {
+                grid-column: 1 / -1;
+                display: flex; align-items: center; justify-content: space-between;
+                text-align: left;
+            }
+            .price { margin: 0; }
+
+            .steps { grid-template-columns: 1fr; gap: 24px; }
+            .steps li::after { display: none; }
+            .contact-grid { grid-template-columns: 1fr; gap: 32px; }
+        }
+    </style>
 </head>
 <body>
-  <header class="hero">
-    <h1 class="title">Xush kelibsiz <span class="Welcome"></span></h1>
-    <p class="subtitle">Bu sayt aynan siz uchun</p>
-    <a class="btn ripple">Olg'a</a>
-  </header>
 
-  <main class="container">
-    <section class="cards">
-      <article class="card">
-        <h3>Siz hohlagan hizmatlar</h3>
-        <p>Shaxsiy ma'luumotlarga kirish</p>
-      </article>
+<header class="hero">
+    <div class="wrap">
+        <nav class="nav" aria-label="Asosiy menyu">
+            <a class="logo" href="#">
+                <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+                    <rect width="34" height="34" rx="9" fill="#1a6fd4"/>
+                    <path d="M14 7h6v7h7v6h-7v7h-6v-7H7v-6h7z" fill="#fff"/>
+                </svg>
+                SmartMed
+            </a>
+            <div class="nav-links">
+                <a href="#shifokorlar">Shifokorlar</a>
+                <a href="#qanday">Qanday ishlaydi</a>
+                <a href="#boglanish">Bog'lanish</a>
+                <!-- Telefon raqamini o'zingiznikiga almashtiring -->
+                <a class="nav-call" href="tel:+998901234567">Qo'ng'iroq qilish</a>
+            </div>
+        </nav>
 
-      <article class="card">
-        <h3>Hakerlik tizimlar</h3>
-        <p>Siz izlagan manbalar shu yerda</p>
-      </article>
+        <div class="hero-body">
+            <h1>Shifokor navbatini 2 daqiqada oling</h1>
+            <p class="lead">Mutaxassisni tanlang, qulay vaqtni belgilang va navbatingizni band qiling. Navbatda turish shart emas.</p>
+            <div class="hero-actions">
+                <a class="btn btn-light" href="#shifokorlar">Shifokorni tanlash</a>
+                <span class="live-status"><span class="live-dot"></span><span id="live-text">Ma'lumot yuklanmoqda</span></span>
+            </div>
+        </div>
+    </div>
 
-      <article class="card">
-        <h3>Kuzatuv</h3>
-        <p>Telefon orqali topish</p>
-      </article>
+    <svg class="ecg" viewBox="0 0 1240 120" preserveAspectRatio="none" aria-hidden="true">
+        <path class="ecg-base" pathLength="1000" d="M0 60 h90 l10 -8 l10 8 h20 l8 10 l12 -70 l12 85 l8 -25 h20 l10 -10 l12 10 h98 h90 l10 -8 l10 8 h20 l8 10 l12 -70 l12 85 l8 -25 h20 l10 -10 l12 10 h98 h90 l10 -8 l10 8 h20 l8 10 l12 -70 l12 85 l8 -25 h20 l10 -10 l12 10 h98 h90 l10 -8 l10 8 h20 l8 10 l12 -70 l12 85 l8 -25 h20 l10 -10 l12 10 h98"/>
+        <path class="ecg-live" pathLength="1000" d="M0 60 h90 l10 -8 l10 8 h20 l8 10 l12 -70 l12 85 l8 -25 h20 l10 -10 l12 10 h98 h90 l10 -8 l10 8 h20 l8 10 l12 -70 l12 85 l8 -25 h20 l10 -10 l12 10 h98 h90 l10 -8 l10 8 h20 l8 10 l12 -70 l12 85 l8 -25 h20 l10 -10 l12 10 h98 h90 l10 -8 l10 8 h20 l8 10 l12 -70 l12 85 l8 -25 h20 l10 -10 l12 10 h98"/>
+    </svg>
+</header>
+
+<main>
+    <section id="shifokorlar">
+        <div class="wrap">
+            <h2>Shifokorlar</h2>
+            <p class="section-sub">Mutaxassislik bo'yicha tanlang. Yashil belgilar bo'sh vaqtlarni ko'rsatadi.</p>
+            <div class="filters" id="filters" role="group" aria-label="Mutaxassislik bo'yicha filtr"></div>
+            <div class="doc-list" id="doctor-list" aria-live="polite">
+                <p class="state">Yuklanmoqda...</p>
+            </div>
+        </div>
     </section>
 
-    <section class="glass">
-      <h2>Hammasi jamlangan </h2>
-      <p>Hakerlik,kuzatuv,va boshqa online ishlar</p>
+    <section id="qanday" style="background:#fff;">
+        <div class="wrap">
+            <h2>Qanday ishlaydi</h2>
+            <p class="section-sub">Navbat olish uchun ro'yxatdan o'tish talab qilinmaydi.</p>
+            <ol class="steps">
+                <li>
+                    <h3>Shifokorni tanlang</h3>
+                    <p>Mutaxassislik va qabul narxini ko'rib, o'zingizga mosini tanlang.</p>
+                </li>
+                <li>
+                    <h3>Vaqtni belgilang</h3>
+                    <p>Ismingizni yozing va bo'sh vaqtlardan birini bosing.</p>
+                </li>
+                <li>
+                    <h3>Kvitansiyani saqlang</h3>
+                    <p>Navbat band bo'lgach, kvitansiya raqamini oling va qabulga shu raqam bilan keling.</p>
+                </li>
+            </ol>
+        </div>
     </section>
-  </main>
 
-  <footer class="footer">
-    <p>©sardorkhasan.off</p>
-  </footer>
+    <section id="boglanish" class="contact">
+        <div class="wrap contact-grid">
+            <div>
+                <h2>Bog'lanish</h2>
+                <p class="section-sub">Navbat olishda qiyinchilik bo'lsa yoki savolingiz bo'lsa, qo'ng'iroq qiling yoki Telegramda yozing.</p>
+                <a class="btn btn-light" href="tel:+998901234567">Hoziroq qo'ng'iroq qilish</a>
+            </div>
+            <!-- Quyidagi ma'lumotlarni o'zingizniki bilan almashtiring -->
+            <ul class="contact-list">
+                <li>
+                    <span class="c-icon" aria-hidden="true">📞</span>
+                    <div><span class="c-label">Telefon</span><a class="c-value" href="tel:+998901234567">+998 90 123 45 67</a></div>
+                </li>
+                <li>
+                    <span class="c-icon" aria-hidden="true">✈️</span>
+                    <div><span class="c-label">Telegram</span><a class="c-value" href="https://t.me/" target="_blank" rel="noopener">@telegram_nomingiz</a></div>
+                </li>
+                <li>
+                    <span class="c-icon" aria-hidden="true">📍</span>
+                    <div><span class="c-label">Manzil</span><span class="c-value">Toshkent sh., klinika manzilini shu yerga yozing</span></div>
+                </li>
+                <li>
+                    <span class="c-icon" aria-hidden="true">🕘</span>
+                    <div><span class="c-label">Ish vaqti</span><span class="c-value">Dushanba - Shanba, 08:00 - 20:00</span></div>
+                </li>
+            </ul>
+        </div>
+    </section>
+</main>
 
-  <script>
-    // Typed effekt (soddalashtirilgan)
-    const words = ["veb", "dizayn", "kod"].map(w => w + ".");
-    let i = 0, j = 0, forward = true;
-    const el = document.querySelector('.typed');
+<footer>
+    <div class="wrap">© <span id="year"></span> SmartMed. Barcha huquqlar himoyalangan.</div>
+</footer>
 
-    function tick() {
-      if (!el) return;
-      if (forward) {
-        el.textContent = words[i].slice(0, ++j);
-        if (j === words[i].length) {
-          forward = false;
-          setTimeout(tick, 800);
-          return;
-        }
-      } else {
-        el.textContent = words[i].slice(0, --j);
-        if (j === 0) {
-          forward = true;
-          i = (i + 1) % words.length;
-        }
-      }
-      setTimeout(tick, forward ? 120 : 40);
+<a class="fab" href="tel:+998901234567" aria-label="Qo'ng'iroq qilish">📞</a>
+
+<!-- Navbat olish oynasi -->
+<div id="booking-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="booking-title">
+    <div class="modal-content">
+        <button class="close-btn" type="button" onclick="closeModals()" aria-label="Yopish">✕</button>
+        <h3 id="booking-title">Navbatni band qilish</h3>
+        <p class="modal-doc"><span id="modal-spec"></span><span id="modal-doctor-name" style="display:inline;color:inherit;font-size:inherit;font-weight:inherit;"></span></p>
+
+        <div class="form-group">
+            <label for="patient-name">Ism va familiyangiz</label>
+            <input type="text" id="patient-name" placeholder="Masalan: Asadbek Olimov" autocomplete="name">
+        </div>
+
+        <div class="form-group">
+            <span class="label" id="time-label">Bo'sh vaqtni tanlang</span>
+            <div class="time-grid" id="time-grid" role="group" aria-labelledby="time-label"></div>
+        </div>
+
+        <p class="form-error" id="form-error" role="alert"></p>
+        <button class="btn btn-block" id="submit-btn" type="button" onclick="submitBooking()">Navbatni band qilish</button>
+    </div>
+</div>
+
+<!-- Muvaffaqiyat oynasi -->
+<div id="success-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="success-title">
+    <div class="modal-content success">
+        <svg class="check" viewBox="0 0 76 76" aria-hidden="true">
+            <circle cx="38" cy="38" r="38"/>
+            <path d="M22 39 l11 11 l22 -23"/>
+        </svg>
+        <h3 id="success-title">Navbat band qilindi</h3>
+        <dl class="receipt">
+            <div><dt>Kvitansiya</dt><dd id="r-id"></dd></div>
+            <div><dt>Bemor</dt><dd id="r-patient"></dd></div>
+            <div><dt>Shifokor</dt><dd id="r-doctor"></dd></div>
+            <div><dt>Vaqt</dt><dd id="r-time"></dd></div>
+            <div><dt>Qabul narxi</dt><dd id="r-price"></dd></div>
+        </dl>
+        <button class="btn btn-block" type="button" onclick="closeModals()">Yopish</button>
+    </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+    const ICONS = { 'Kardiolog': '❤️', 'Stomatolog': '🦷', 'Pediatr': '🧸' };
+    const iconFor = s => ICONS[s] || '🩺';
+
+    let doctors = [];
+    let activeFilter = 'Hammasi';
+    let currentDoctor = null;
+    let selectedTime = null;
+
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    $('year').textContent = new Date().getFullYear();
+
+    function showToast(text) {
+        const t = $('toast');
+        t.textContent = text;
+        t.classList.add('show');
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => t.classList.remove('show'), 3500);
     }
-    tick();
 
-    // Ripple effektli tugma
-    document.querySelectorAll('.ripple').forEach(btn => {
-      btn.addEventListener('click', function(e) {
-        const rect = this.getBoundingClientRect();
-        const circle = document.createElement('span');
-        const size = Math.max(rect.width, rect.height);
-        circle.style.width = circle.style.height = size + 'px';
-        circle.style.left = (e.clientX - rect.left - size/2) + 'px';
-        circle.style.top = (e.clientY - rect.top - size/2) + 'px';
-        circle.classList.add('ripple-effect');
-        this.appendChild(circle);
-        setTimeout(() => circle.remove(), 600);
-      });
+    async function loadDoctors() {
+        try {
+            const response = await fetch('/vrachlar');
+            if (!response.ok) throw new Error('server');
+            doctors = await response.json();
+            renderHero();
+            renderFilters();
+            renderDoctors();
+        } catch (error) {
+            $('live-text').textContent = 'Server bilan aloqa yo\'q';
+            $('doctor-list').innerHTML = '<p class="state">Ma\'lumotni yuklab bo\'lmadi. Server ishlayotganini tekshiring va sahifani yangilang.</p>';
+        }
+    }
+
+    function renderHero() {
+        const slots = doctors.reduce((sum, d) => sum + d.bosh_vaqtlar.length, 0);
+        $('live-text').textContent = `${doctors.length} ta shifokor, ${slots} ta bo'sh vaqt`;
+    }
+
+    function renderFilters() {
+        const specs = ['Hammasi', ...new Set(doctors.map(d => d.mutaxassislik))];
+        $('filters').innerHTML = specs.map(s =>
+            `<button type="button" class="chip" data-spec="${esc(s)}" aria-pressed="${s === activeFilter}">${esc(s)}</button>`
+        ).join('');
+    }
+
+    function renderDoctors() {
+        const list = doctors.filter(d => activeFilter === 'Hammasi' || d.mutaxassislik === activeFilter);
+        if (list.length === 0) {
+            $('doctor-list').innerHTML = '<p class="state">Bu yo\'nalishda shifokor topilmadi. Boshqa mutaxassislikni tanlang.</p>';
+            return;
+        }
+        $('doctor-list').innerHTML = list.map(d => {
+            const shown = d.bosh_vaqtlar.slice(0, 4).map(t => `<li>${esc(t)}</li>`).join('');
+            const more = d.bosh_vaqtlar.length > 4 ? `<li>+${d.bosh_vaqtlar.length - 4}</li>` : '';
+            const slots = d.bosh_vaqtlar.length ? shown + more : '<li class="none">Bo\'sh vaqt qolmagan</li>';
+            return `
+                <article class="doc">
+                    <div class="doc-avatar" aria-hidden="true">${iconFor(d.mutaxassislik)}</div>
+                    <div>
+                        <h3>${esc(d.ism)}</h3>
+                        <p class="doc-spec">${esc(d.mutaxassislik)}</p>
+                        <ul class="slots">${slots}</ul>
+                    </div>
+                    <div class="doc-side">
+                        <div class="price">${esc(d.narxi)}</div>
+                        <button type="button" class="btn" data-id="${Number(d.id)}" ${d.bosh_vaqtlar.length ? '' : 'disabled'}>Navbat olish</button>
+                    </div>
+                </article>`;
+        }).join('');
+    }
+
+    $('filters').addEventListener('click', e => {
+        const btn = e.target.closest('.chip');
+        if (!btn) return;
+        activeFilter = btn.dataset.spec;
+        renderFilters();
+        renderDoctors();
     });
-  </script>
+
+    $('doctor-list').addEventListener('click', e => {
+        const btn = e.target.closest('button[data-id]');
+        if (btn) prepareBooking(Number(btn.dataset.id));
+    });
+
+    function prepareBooking(id) {
+        const vrach = doctors.find(v => v.id === id);
+        if (!vrach) return;
+        currentDoctor = vrach;
+        selectedTime = null;
+
+        $('modal-spec').textContent = vrach.mutaxassislik + ' · ' + vrach.narxi;
+        $('modal-doctor-name').textContent = vrach.ism;
+        $('form-error').textContent = '';
+
+        $('time-grid').innerHTML = vrach.bosh_vaqtlar.map(t =>
+            `<button type="button" class="chip" data-time="${esc(t)}" aria-pressed="false">${esc(t)}</button>`
+        ).join('');
+
+        $('booking-modal').classList.add('open');
+        $('patient-name').focus();
+    }
+
+    $('time-grid').addEventListener('click', e => {
+        const btn = e.target.closest('.chip');
+        if (!btn) return;
+        selectedTime = btn.dataset.time;
+        $('time-grid').querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(c === btn)));
+        $('form-error').textContent = '';
+    });
+
+    function closeModals() {
+        $('booking-modal').classList.remove('open');
+        $('success-modal').classList.remove('open');
+        $('patient-name').value = '';
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModals(); });
+    document.querySelectorAll('.modal').forEach(m => m.addEventListener('mousedown', e => { if (e.target === m) closeModals(); }));
+
+    async function submitBooking() {
+        const name = $('patient-name').value.trim();
+        const err = $('form-error');
+
+        if (name.length < 3) { err.textContent = 'Ism va familiyangizni to\'liq yozing.'; return; }
+        if (!selectedTime) { err.textContent = 'Bo\'sh vaqtlardan birini tanlang.'; return; }
+
+        const btn = $('submit-btn');
+        btn.disabled = true;
+        btn.textContent = 'Yuborilmoqda...';
+
+        try {
+            const response = await fetch('/ochrat-olish', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    vrach_id: currentDoctor.id,
+                    bemor_ismi: name,
+                    tanlangan_vaqt: selectedTime
+                })
+            });
+            const result = await response.json();
+
+            if (!response.ok) {
+                err.textContent = result.detail || 'Navbat band qilinmadi. Qayta urinib ko\'ring.';
+                await loadDoctors();
+                return;
+            }
+
+            const b = result.batafsil_malumot;
+            $('r-id').textContent = '#' + b.navbat_id;
+            $('r-patient').textContent = b.bemor_ismi;
+            $('r-doctor').textContent = b.vrach_ismi;
+            $('r-time').textContent = b.vaqt;
+            $('r-price').textContent = b.xizmat_haqqi;
+
+            $('booking-modal').classList.remove('open');
+            $('patient-name').value = '';
+            $('success-modal').classList.add('open');
+            loadDoctors();
+        } catch (error) {
+            showToast('Server bilan aloqa uzildi. Internetni tekshirib, qayta urinib ko\'ring.');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Navbatni band qilish';
+        }
+    }
+
+    loadDoctors();
+</script>
 </body>
 </html>
